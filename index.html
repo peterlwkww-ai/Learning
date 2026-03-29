@@ -16,7 +16,7 @@
 
     /* ── Header ── */
     header {
-      background: linear-gradient(135deg, #667eea, #764ba2);
+      background: linear-gradient(135deg, #0ea5e9, #10b981);
       color: white;
       padding: 20px 24px 28px;
     }
@@ -61,7 +61,7 @@
       outline: none;
       transition: border-color 0.2s;
     }
-    .input-row input[type="text"]:focus { border-color: #667eea; }
+    .input-row input[type="text"]:focus { border-color: #0ea5e9; }
 
     .input-row input[type="number"] {
       width: 110px;
@@ -72,7 +72,7 @@
       outline: none;
       transition: border-color 0.2s;
     }
-    .input-row input[type="number"]:focus { border-color: #667eea; }
+    .input-row input[type="number"]:focus { border-color: #0ea5e9; }
 
     /* Category pills */
     .category-row {
@@ -93,17 +93,17 @@
       align-items: center;
       gap: 4px;
     }
-    .cat-pill:hover { border-color: #667eea; color: #667eea; }
+    .cat-pill:hover { border-color: #0ea5e9; color: #0ea5e9; }
     .cat-pill.active {
-      background: #667eea;
-      border-color: #667eea;
+      background: linear-gradient(135deg, #0ea5e9, #10b981);
+      border-color: #0ea5e9;
       color: white;
     }
 
     .btn-add {
       width: 100%;
       padding: 13px;
-      background: linear-gradient(135deg, #667eea, #764ba2);
+      background: linear-gradient(135deg, #0ea5e9, #10b981);
       color: white;
       border: none;
       border-radius: 10px;
@@ -128,6 +128,7 @@
       align-items: center;
       justify-content: space-between;
       margin-bottom: 14px;
+      gap: 6px;
     }
     .date-nav button {
       background: white;
@@ -137,9 +138,29 @@
       font-size: 1rem;
       cursor: pointer;
       display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
     }
-    .date-nav button:hover { border-color: #667eea; color: #667eea; }
-    .date-nav .nav-label { font-weight: 600; font-size: 0.9rem; }
+    .date-nav button:hover { border-color: #0ea5e9; color: #0ea5e9; }
+    .date-nav .nav-center { display: flex; align-items: center; gap: 6px; flex: 1; justify-content: center; }
+    .date-nav .nav-label { font-weight: 600; font-size: 0.9rem; cursor: pointer; }
+    .date-nav .nav-label:hover { color: #0ea5e9; }
+    .btn-cal {
+      background: white;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 8px;
+      width: 34px; height: 34px;
+      font-size: 1rem;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .btn-cal:hover { border-color: #0ea5e9; color: #0ea5e9; }
+    #calInput {
+      position: absolute;
+      opacity: 0;
+      width: 0; height: 0;
+      pointer-events: none;
+    }
 
     /* ── Expense list ── */
     .section-title {
@@ -279,7 +300,11 @@
   <!-- Date Navigator -->
   <div class="date-nav">
     <button onclick="shiftDay(-1)">&#8592;</button>
-    <span class="nav-label" id="navLabel"></span>
+    <div class="nav-center">
+      <span class="nav-label" id="navLabel" onclick="openCal()"></span>
+      <button class="btn-cal" onclick="openCal()" title="Pick a date">&#128197;</button>
+      <input type="date" id="calInput" onchange="pickDate(this.value)" />
+    </div>
     <button onclick="shiftDay(1)">&#8594;</button>
   </div>
 
@@ -484,6 +509,25 @@
         </div>`;
     });
     document.getElementById("summaryCard").style.display = "block";
+  }
+
+  // ── Calendar picker ──────────────────────────────────────────────
+  function openCal() {
+    const cal = document.getElementById("calInput");
+    cal.max = todayStr();
+    cal.value = viewDate;
+    cal.style.position = "absolute";
+    cal.style.opacity = "0";
+    cal.style.pointerEvents = "auto";
+    cal.showPicker ? cal.showPicker() : cal.click();
+  }
+
+  function pickDate(val) {
+    if (!val || val > todayStr()) { showToast("Can't go to the future!"); return; }
+    viewDate = val;
+    render();
+    const cal = document.getElementById("calInput");
+    cal.style.pointerEvents = "none";
   }
 
   // ── Helpers ───────────────────────────────────────────────────────
