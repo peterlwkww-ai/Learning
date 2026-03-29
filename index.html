@@ -6,69 +6,286 @@
   <title>Daily Expense Tracker</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #f0f4f8; color: #2d3748; min-height: 100vh; }
-    header { background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 20px 24px 28px; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #f0f4f8;
+      color: #2d3748;
+      min-height: 100vh;
+    }
+
+    /* ── Header ── */
+    header {
+      background: linear-gradient(135deg, #0ea5e9, #10b981);
+      color: white;
+      padding: 20px 24px 28px;
+    }
     header h1 { font-size: 1.4rem; font-weight: 700; letter-spacing: -0.3px; }
     header .date { font-size: 0.85rem; opacity: 0.85; margin-top: 2px; }
-    .total-box { margin-top: 16px; background: rgba(255,255,255,0.18); border-radius: 14px; padding: 14px 18px; display: flex; justify-content: space-between; align-items: center; }
+    .total-box {
+      margin-top: 16px;
+      background: rgba(255,255,255,0.18);
+      border-radius: 14px;
+      padding: 14px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
     .total-box .label { font-size: 0.8rem; opacity: 0.85; text-transform: uppercase; letter-spacing: 0.5px; }
     .total-box .amount { font-size: 2rem; font-weight: 800; }
+
+    /* ── Main container ── */
     main { max-width: 480px; margin: 0 auto; padding: 20px 16px 100px; }
-    .add-card { background: white; border-radius: 16px; padding: 18px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); margin-bottom: 20px; }
+
+    /* ── Add expense card ── */
+    .add-card {
+      background: white;
+      border-radius: 16px;
+      padding: 18px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+      margin-bottom: 20px;
+    }
     .add-card h2 { font-size: 0.95rem; font-weight: 600; margin-bottom: 14px; color: #4a5568; }
-    .input-row { display: flex; gap: 8px; margin-bottom: 10px; }
-    .input-row input[type="text"] { flex: 1; padding: 12px 14px; border: 1.5px solid #e2e8f0; border-radius: 10px; font-size: 1rem; outline: none; transition: border-color 0.2s; }
-    .input-row input[type="text"]:focus { border-color: #667eea; }
-    .input-row input[type="number"] { width: 110px; padding: 12px 14px; border: 1.5px solid #e2e8f0; border-radius: 10px; font-size: 1rem; outline: none; transition: border-color 0.2s; }
-    .input-row input[type="number"]:focus { border-color: #667eea; }
-    .category-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
-    .cat-pill { padding: 5px 12px; border-radius: 20px; border: 1.5px solid #e2e8f0; font-size: 0.78rem; cursor: pointer; background: white; transition: all 0.15s; display: flex; align-items: center; gap: 4px; }
-    .cat-pill:hover { border-color: #667eea; color: #667eea; }
-    .cat-pill.active { background: #667eea; border-color: #667eea; color: white; }
-    .btn-add { width: 100%; padding: 13px; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; border-radius: 10px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: opacity 0.2s; }
+
+    .input-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .input-row input[type="text"] {
+      flex: 1;
+      padding: 12px 14px;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 10px;
+      font-size: 1rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .input-row input[type="text"]:focus { border-color: #0ea5e9; }
+
+    .input-row input[type="number"] {
+      width: 110px;
+      padding: 12px 14px;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 10px;
+      font-size: 1rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .input-row input[type="number"]:focus { border-color: #0ea5e9; }
+
+    /* Category pills */
+    .category-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+    .cat-pill {
+      padding: 5px 12px;
+      border-radius: 20px;
+      border: 1.5px solid #e2e8f0;
+      font-size: 0.78rem;
+      cursor: pointer;
+      background: white;
+      transition: all 0.15s;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .cat-pill:hover { border-color: #0ea5e9; color: #0ea5e9; }
+    .cat-pill.active {
+      background: linear-gradient(135deg, #0ea5e9, #10b981);
+      border-color: #0ea5e9;
+      color: white;
+    }
+
+    .btn-add {
+      width: 100%;
+      padding: 13px;
+      background: linear-gradient(135deg, #0ea5e9, #10b981);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
     .btn-add:hover { opacity: 0.9; }
-    .hint { font-size: 0.75rem; color: #a0aec0; margin-bottom: 10px; }
-    .date-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
-    .date-nav button { background: white; border: 1.5px solid #e2e8f0; border-radius: 8px; width: 34px; height: 34px; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-    .date-nav button:hover { border-color: #667eea; color: #667eea; }
-    .date-nav .nav-label { font-weight: 600; font-size: 0.9rem; }
-    .section-title { font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: #718096; margin-bottom: 10px; }
+    .btn-add:active { opacity: 0.8; }
+
+    /* ── Quick add hints ── */
+    .hint {
+      font-size: 0.75rem;
+      color: #a0aec0;
+      margin-bottom: 10px;
+    }
+
+    /* ── Date navigator ── */
+    .date-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+      gap: 6px;
+    }
+    .date-nav button {
+      background: white;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 8px;
+      width: 34px; height: 34px;
+      font-size: 1rem;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .date-nav button:hover { border-color: #0ea5e9; color: #0ea5e9; }
+    .date-nav .nav-center { display: flex; align-items: center; gap: 6px; flex: 1; justify-content: center; }
+    .date-nav .nav-label { font-weight: 600; font-size: 0.9rem; cursor: pointer; }
+    .date-nav .nav-label:hover { color: #0ea5e9; }
+    .btn-cal {
+      background: white;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 8px;
+      width: 34px; height: 34px;
+      font-size: 1rem;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .btn-cal:hover { border-color: #0ea5e9; color: #0ea5e9; }
+    #calInput {
+      position: absolute;
+      opacity: 0;
+      width: 0; height: 0;
+      pointer-events: none;
+    }
+
+    /* ── Expense list ── */
+    .section-title {
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #718096;
+      margin-bottom: 10px;
+    }
+
     .expense-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
-    .expense-item { background: white; border-radius: 12px; padding: 13px 15px; display: flex; align-items: center; gap: 12px; box-shadow: 0 1px 6px rgba(0,0,0,0.06); animation: slideIn 0.2s ease; }
-    @keyframes slideIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
-    .cat-icon { width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.15rem; flex-shrink: 0; }
+
+    .expense-item {
+      background: white;
+      border-radius: 12px;
+      padding: 13px 15px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+      animation: slideIn 0.2s ease;
+    }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(-6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .cat-icon {
+      width: 38px; height: 38px;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.15rem;
+      flex-shrink: 0;
+    }
     .expense-info { flex: 1; min-width: 0; }
-    .expense-info .desc { font-size: 0.95rem; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .expense-info .desc {
+      font-size: 0.95rem;
+      font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
     .expense-info .meta { font-size: 0.75rem; color: #a0aec0; margin-top: 1px; }
+
     .expense-right { text-align: right; flex-shrink: 0; }
     .expense-right .amt { font-size: 1.05rem; font-weight: 700; }
-    .btn-delete { background: none; border: none; color: #cbd5e0; font-size: 1rem; cursor: pointer; padding: 2px 4px; margin-top: 2px; }
+    .btn-delete {
+      background: none;
+      border: none;
+      color: #cbd5e0;
+      font-size: 1rem;
+      cursor: pointer;
+      padding: 2px 4px;
+      margin-top: 2px;
+    }
     .btn-delete:hover { color: #fc8181; }
-    .empty-state { text-align: center; padding: 32px 16px; color: #a0aec0; }
+
+    .empty-state {
+      text-align: center;
+      padding: 32px 16px;
+      color: #a0aec0;
+    }
     .empty-state .icon { font-size: 2.5rem; margin-bottom: 8px; }
     .empty-state p { font-size: 0.9rem; }
-    .summary-card { background: white; border-radius: 16px; padding: 16px 18px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); }
+
+    /* ── Category summary ── */
+    .summary-card {
+      background: white;
+      border-radius: 16px;
+      padding: 16px 18px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    }
     .summary-card h2 { font-size: 0.95rem; font-weight: 600; color: #4a5568; margin-bottom: 12px; }
-    .summary-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+
+    .summary-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
     .summary-row .s-icon { font-size: 1rem; width: 24px; text-align: center; }
     .summary-row .s-label { flex: 1; font-size: 0.85rem; }
     .bar-wrap { flex: 2; background: #edf2f7; border-radius: 6px; height: 7px; overflow: hidden; }
     .bar-fill { height: 100%; border-radius: 6px; transition: width 0.4s ease; }
     .summary-row .s-amt { font-size: 0.85rem; font-weight: 600; min-width: 60px; text-align: right; }
-    .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px); background: #2d3748; color: white; padding: 10px 20px; border-radius: 24px; font-size: 0.85rem; transition: transform 0.3s ease; z-index: 999; pointer-events: none; }
+
+    /* ── Toast ── */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: #2d3748;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 24px;
+      font-size: 0.85rem;
+      transition: transform 0.3s ease;
+      z-index: 999;
+      pointer-events: none;
+    }
     .toast.show { transform: translateX(-50%) translateY(0); }
   </style>
 </head>
 <body>
+
 <header>
   <h1>💰 Daily Expense Tracker</h1>
   <div class="date" id="headerDate"></div>
   <div class="total-box">
-    <div><div class="label">Today's Total</div><div class="amount" id="todayTotal">$0.00</div></div>
-    <div style="text-align:right"><div class="label">This Month</div><div style="font-size:1.1rem;font-weight:700;" id="monthTotal">$0.00</div></div>
+    <div>
+      <div class="label">Today's Total</div>
+      <div class="amount" id="todayTotal">$0.00</div>
+    </div>
+    <div style="text-align:right">
+      <div class="label">This Month</div>
+      <div style="font-size:1.1rem;font-weight:700;" id="monthTotal">$0.00</div>
+    </div>
   </div>
 </header>
+
 <main>
+
+  <!-- Add Expense -->
   <div class="add-card">
     <h2>Add Expense</h2>
     <div class="input-row">
@@ -79,37 +296,52 @@
     <div class="category-row" id="catRow"></div>
     <button class="btn-add" onclick="addExpense()">+ Add Expense</button>
   </div>
+
+  <!-- Date Navigator -->
   <div class="date-nav">
     <button onclick="shiftDay(-1)">&#8592;</button>
-    <span class="nav-label" id="navLabel"></span>
+    <div class="nav-center">
+      <span class="nav-label" id="navLabel" onclick="openCal()"></span>
+      <button class="btn-cal" onclick="openCal()" title="Pick a date">&#128197;</button>
+      <input type="date" id="calInput" onchange="pickDate(this.value)" />
+    </div>
     <button onclick="shiftDay(1)">&#8594;</button>
   </div>
+
+  <!-- Expense List -->
   <div class="section-title">Expenses</div>
   <div class="expense-list" id="expenseList"></div>
+
+  <!-- Category Summary -->
   <div class="summary-card" id="summaryCard" style="display:none">
     <h2>Breakdown by Category</h2>
     <div id="summaryRows"></div>
   </div>
+
 </main>
+
 <div class="toast" id="toast"></div>
+
 <script>
   const CATEGORIES = [
-    { id: "food",          label: "Food",        icon: "🍔", color: "#fef3c7", bar: "#f59e0b" },
-    { id: "transport",     label: "Transport",   icon: "🚌", color: "#dbeafe", bar: "#3b82f6" },
-    { id: "shopping",      label: "Shopping",    icon: "🛍️", color: "#fce7f3", bar: "#ec4899" },
-    { id: "health",        label: "Health",      icon: "💊", color: "#dcfce7", bar: "#22c55e" },
-    { id: "entertainment", label: "Fun",         icon: "🎮", color: "#ede9fe", bar: "#8b5cf6" },
-    { id: "bills",         label: "Bills",       icon: "📄", color: "#fee2e2", bar: "#ef4444" },
-    { id: "other",         label: "Other",       icon: "📦", color: "#f1f5f9", bar: "#94a3b8" },
+    { id: "food",        label: "Food",        icon: "🍔", color: "#fef3c7", bar: "#f59e0b", text: "#92400e" },
+    { id: "transport",   label: "Transport",   icon: "🚌", color: "#dbeafe", bar: "#3b82f6", text: "#1e3a8a" },
+    { id: "shopping",    label: "Shopping",    icon: "🛍️", color: "#fce7f3", bar: "#ec4899", text: "#831843" },
+    { id: "health",      label: "Health",      icon: "💊", color: "#dcfce7", bar: "#22c55e", text: "#14532d" },
+    { id: "entertainment",label:"Fun",         icon: "🎮", color: "#ede9fe", bar: "#8b5cf6", text: "#4c1d95" },
+    { id: "bills",       label: "Bills",       icon: "📄", color: "#fee2e2", bar: "#ef4444", text: "#7f1d1d" },
+    { id: "other",       label: "Other",       icon: "📦", color: "#f1f5f9", bar: "#94a3b8", text: "#334155" },
   ];
+
   const KEYWORDS = {
     food:          ["food","lunch","dinner","breakfast","coffee","cafe","restaurant","eat","meal","snack","drink","bubble","pizza","noodle","rice","bread","milk","grocery","market","supermarket"],
     transport:     ["bus","train","taxi","grab","uber","mrt","lrt","ferry","fuel","petrol","parking","toll","flight","ticket","transport","bike","car"],
     shopping:      ["shop","buy","purchase","store","mall","amazon","lazada","shopee","clothes","shirt","shoes","bag","online"],
     health:        ["doctor","clinic","pharmacy","medicine","drug","hospital","health","dental","gym","fitness"],
-    entertainment: ["movie","cinema","game","netflix","spotify","youtube","fun","concert","sport","book","magazine"],
+    entertainment: ["movie","cinema","game","netflix","spotify","youtube","fun","concert","sport","ticket","book","magazine"],
     bills:         ["bill","electric","water","internet","wifi","phone","rent","insurance","subscription","credit"],
   };
+
   function guessCategory(desc) {
     const lower = desc.toLowerCase();
     for (const [cat, words] of Object.entries(KEYWORDS)) {
@@ -117,21 +349,26 @@
     }
     return "other";
   }
-  let viewDate = todayStr(), selectedCat = "food";
+
+  let viewDate = todayStr();
+  let selectedCat = "food";
+
   function todayStr() { return new Date().toISOString().slice(0, 10); }
   function loadData() { return JSON.parse(localStorage.getItem("expenses_v1") || "[]"); }
-  function saveData(d) { localStorage.setItem("expenses_v1", JSON.stringify(d)); }
+  function saveData(data) { localStorage.setItem("expenses_v1", JSON.stringify(data)); }
+
   function buildCatRow() {
     const row = document.getElementById("catRow");
     row.innerHTML = "";
     CATEGORIES.forEach(c => {
       const btn = document.createElement("button");
       btn.className = "cat-pill" + (c.id === selectedCat ? " active" : "");
-      btn.innerHTML = c.icon + " " + c.label;
+      btn.innerHTML = `${c.icon} ${c.label}`;
       btn.onclick = () => { selectedCat = c.id; buildCatRow(); };
       row.appendChild(btn);
     });
   }
+
   function addExpense() {
     const desc = document.getElementById("descInput").value.trim();
     const amt  = parseFloat(document.getElementById("amtInput").value);
@@ -139,7 +376,14 @@
     if (!amt || amt <= 0) { showToast("Please enter a valid amount."); return; }
     const cat = guessCategory(desc) !== "other" ? guessCategory(desc) : selectedCat;
     const data = loadData();
-    data.push({ id: Date.now(), date: todayStr(), desc, amt: Math.round(amt*100)/100, cat, time: new Date().toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"}) });
+    data.push({
+      id:   Date.now(),
+      date: todayStr(),
+      desc,
+      amt:  Math.round(amt * 100) / 100,
+      cat,
+      time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+    });
     saveData(data);
     document.getElementById("descInput").value = "";
     document.getElementById("amtInput").value  = "";
@@ -147,53 +391,122 @@
     render();
     showToast("Expense added!");
   }
+
   document.addEventListener("DOMContentLoaded", () => {
-    document.getElementById("amtInput").addEventListener("keydown", e => { if (e.key==="Enter") addExpense(); });
-    document.getElementById("descInput").addEventListener("keydown", e => { if (e.key==="Enter") document.getElementById("amtInput").focus(); });
-    document.getElementById("descInput").addEventListener("input", e => { const g=guessCategory(e.target.value); if(g!=="other"){selectedCat=g;buildCatRow();} });
+    document.getElementById("amtInput").addEventListener("keydown", e => { if (e.key === "Enter") addExpense(); });
+    document.getElementById("descInput").addEventListener("keydown", e => { if (e.key === "Enter") document.getElementById("amtInput").focus(); });
+    document.getElementById("descInput").addEventListener("input", e => {
+      const guess = guessCategory(e.target.value);
+      if (guess !== "other") { selectedCat = guess; buildCatRow(); }
+    });
   });
-  function deleteExpense(id) { saveData(loadData().filter(e=>e.id!==id)); render(); showToast("Removed."); }
+
+  function deleteExpense(id) {
+    saveData(loadData().filter(e => e.id !== id));
+    render();
+    showToast("Removed.");
+  }
+
   function shiftDay(delta) {
-    const d = new Date(viewDate+"T00:00:00"); d.setDate(d.getDate()+delta);
-    const next = d.toISOString().slice(0,10);
+    const d = new Date(viewDate + "T00:00:00");
+    d.setDate(d.getDate() + delta);
+    const next = d.toISOString().slice(0, 10);
     if (next > todayStr()) { showToast("Can't go to the future!"); return; }
-    viewDate = next; render();
+    viewDate = next;
+    render();
   }
+
   function friendlyDate(str) {
-    const today=todayStr(), yest=(()=>{const d=new Date();d.setDate(d.getDate()-1);return d.toISOString().slice(0,10);})();
-    if(str===today) return "Today"; if(str===yest) return "Yesterday";
-    return new Date(str+"T00:00:00").toLocaleDateString(undefined,{weekday:"short",month:"short",day:"numeric"});
+    const today = todayStr();
+    const yest  = (() => { const d = new Date(); d.setDate(d.getDate()-1); return d.toISOString().slice(0,10); })();
+    if (str === today) return "Today";
+    if (str === yest)  return "Yesterday";
+    return new Date(str + "T00:00:00").toLocaleDateString(undefined, { weekday:"short", month:"short", day:"numeric" });
   }
+
+  function openCal() {
+    const cal = document.getElementById("calInput");
+    cal.max = todayStr();
+    cal.value = viewDate;
+    cal.style.pointerEvents = "auto";
+    cal.showPicker ? cal.showPicker() : cal.click();
+  }
+
+  function pickDate(val) {
+    if (!val || val > todayStr()) { showToast("Can't go to the future!"); return; }
+    viewDate = val;
+    render();
+    document.getElementById("calInput").style.pointerEvents = "none";
+  }
+
   function render() {
-    const data=loadData(), today=todayStr();
-    document.getElementById("todayTotal").textContent="$"+data.filter(e=>e.date===today).reduce((s,e)=>s+e.amt,0).toFixed(2);
-    document.getElementById("monthTotal").textContent="$"+data.filter(e=>e.date.startsWith(today.slice(0,7))).reduce((s,e)=>s+e.amt,0).toFixed(2);
-    document.getElementById("headerDate").textContent=new Date().toLocaleDateString(undefined,{weekday:"long",year:"numeric",month:"long",day:"numeric"});
-    document.getElementById("navLabel").textContent=friendlyDate(viewDate);
-    const items=data.filter(e=>e.date===viewDate).reverse();
-    const list=document.getElementById("expenseList"); list.innerHTML="";
-    if(items.length===0){
-      list.innerHTML='<div class="empty-state"><div class="icon">📭</div><p>No expenses recorded for '+friendlyDate(viewDate)+'.</p></div>';
-      document.getElementById("summaryCard").style.display="none"; return;
+    const data = loadData();
+    const today = todayStr();
+    const todayAmt = data.filter(e => e.date === today).reduce((s, e) => s + e.amt, 0);
+    const monthAmt = data.filter(e => e.date.startsWith(today.slice(0,7))).reduce((s, e) => s + e.amt, 0);
+    document.getElementById("todayTotal").textContent = "$" + todayAmt.toFixed(2);
+    document.getElementById("monthTotal").textContent = "$" + monthAmt.toFixed(2);
+    document.getElementById("headerDate").textContent = new Date().toLocaleDateString(undefined, { weekday:"long", year:"numeric", month:"long", day:"numeric" });
+    document.getElementById("navLabel").textContent = friendlyDate(viewDate);
+
+    const items = data.filter(e => e.date === viewDate).reverse();
+    const list  = document.getElementById("expenseList");
+    list.innerHTML = "";
+
+    if (items.length === 0) {
+      list.innerHTML = `<div class="empty-state"><div class="icon">📭</div><p>No expenses recorded for ${friendlyDate(viewDate)}.</p></div>`;
+      document.getElementById("summaryCard").style.display = "none";
+      return;
     }
-    items.forEach(e=>{
-      const c=CATEGORIES.find(c=>c.id===e.cat)||CATEGORIES.at(-1);
-      const div=document.createElement("div"); div.className="expense-item";
-      div.innerHTML='<div class="cat-icon" style="background:'+c.color+'">'+c.icon+'</div><div class="expense-info"><div class="desc">'+escHtml(e.desc)+'</div><div class="meta">'+c.label+' · '+(e.time||'')+'</div></div><div class="expense-right"><div class="amt">$'+e.amt.toFixed(2)+'</div><button class="btn-delete" onclick="deleteExpense('+e.id+')" title="Delete">✕</button></div>';
+
+    items.forEach(e => {
+      const c   = CATEGORIES.find(c => c.id === e.cat) || CATEGORIES.at(-1);
+      const div = document.createElement("div");
+      div.className = "expense-item";
+      div.innerHTML = `
+        <div class="cat-icon" style="background:${c.color};">${c.icon}</div>
+        <div class="expense-info">
+          <div class="desc">${escHtml(e.desc)}</div>
+          <div class="meta">${c.label} · ${e.time || ""}</div>
+        </div>
+        <div class="expense-right">
+          <div class="amt">$${e.amt.toFixed(2)}</div>
+          <button class="btn-delete" onclick="deleteExpense(${e.id})" title="Delete">✕</button>
+        </div>`;
       list.appendChild(div);
     });
-    const totals={}; items.forEach(e=>{totals[e.cat]=(totals[e.cat]||0)+e.amt;});
-    const dayTotal=items.reduce((s,e)=>s+e.amt,0);
-    const sr=document.getElementById("summaryRows"); sr.innerHTML="";
-    CATEGORIES.filter(c=>totals[c.id]).forEach(c=>{
-      const pct=dayTotal>0?(totals[c.id]/dayTotal*100):0;
-      sr.innerHTML+='<div class="summary-row"><span class="s-icon">'+c.icon+'</span><span class="s-label">'+c.label+'</span><div class="bar-wrap"><div class="bar-fill" style="width:'+pct+'%;background:'+c.bar+'"></div></div><span class="s-amt">$'+totals[c.id].toFixed(2)+'</span></div>';
+
+    const totals = {};
+    items.forEach(e => { totals[e.cat] = (totals[e.cat] || 0) + e.amt; });
+    const dayTotal = items.reduce((s, e) => s + e.amt, 0);
+    const summaryRows = document.getElementById("summaryRows");
+    summaryRows.innerHTML = "";
+    CATEGORIES.filter(c => totals[c.id]).forEach(c => {
+      const pct = dayTotal > 0 ? (totals[c.id] / dayTotal * 100) : 0;
+      summaryRows.innerHTML += `
+        <div class="summary-row">
+          <span class="s-icon">${c.icon}</span>
+          <span class="s-label">${c.label}</span>
+          <div class="bar-wrap"><div class="bar-fill" style="width:${pct}%;background:${c.bar}"></div></div>
+          <span class="s-amt">$${totals[c.id].toFixed(2)}</span>
+        </div>`;
     });
-    document.getElementById("summaryCard").style.display="block";
+    document.getElementById("summaryCard").style.display = "block";
   }
-  function escHtml(s){return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
-  function showToast(msg){const t=document.getElementById("toast");t.textContent=msg;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),2200);}
-  buildCatRow(); render();
+
+  function escHtml(s) {
+    return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById("toast");
+    t.textContent = msg;
+    t.classList.add("show");
+    setTimeout(() => t.classList.remove("show"), 2200);
+  }
+
+  buildCatRow();
+  render();
 </script>
 </body>
 </html>
