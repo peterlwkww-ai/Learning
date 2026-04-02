@@ -248,6 +248,27 @@
     .bar-fill { height: 100%; border-radius: 6px; transition: width 0.4s ease; }
     .summary-row .s-amt { font-size: 0.85rem; font-weight: 600; min-width: 60px; text-align: right; }
 
+    /* ── Currency selector ── */
+    .currency-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .currency-row label { font-size: 0.78rem; opacity: 0.85; text-transform: uppercase; letter-spacing: 0.5px; }
+    #currencySelect {
+      background: rgba(255,255,255,0.22);
+      border: 1.5px solid rgba(255,255,255,0.4);
+      color: white;
+      border-radius: 8px;
+      padding: 5px 10px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      outline: none;
+    }
+    #currencySelect option { background: #1a202c; color: white; }
+
     /* ── Toast ── */
     .toast {
       position: fixed;
@@ -271,6 +292,21 @@
 <header>
   <h1>💰 Daily Expense Tracker</h1>
   <div class="date" id="headerDate"></div>
+  <div class="currency-row">
+    <label>Currency</label>
+    <select id="currencySelect" onchange="setCurrency(this.value)">
+      <option value="$">$ USD</option>
+      <option value="RM">RM MYR</option>
+      <option value="S$">S$ SGD</option>
+      <option value="£">£ GBP</option>
+      <option value="€">€ EUR</option>
+      <option value="¥">¥ JPY</option>
+      <option value="฿">฿ THB</option>
+      <option value="Rp">Rp IDR</option>
+      <option value="A$">A$ AUD</option>
+      <option value="₩">₩ KRW</option>
+    </select>
+  </div>
   <div class="total-box">
     <div>
       <div class="label">Today's Total</div>
@@ -350,6 +386,23 @@
       if (words.some(w => lower.includes(w))) return cat;
     }
     return "other";
+  }
+
+  // ── Currency ──────────────────────────────────────────────────────
+  let currency = localStorage.getItem("currency") || "$";
+
+  function setCurrency(val) {
+    currency = val;
+    localStorage.setItem("currency", val);
+    render();
+  }
+
+  function fmt(amt) {
+    return currency + amt.toFixed(2);
+  }
+
+  function initCurrency() {
+    document.getElementById("currencySelect").value = currency;
   }
 
   // ── State ─────────────────────────────────────────────────────────
@@ -457,8 +510,8 @@
     const todayAmt  = data.filter(e => e.date === today).reduce((s, e) => s + e.amt, 0);
     const monthPfx  = today.slice(0, 7);
     const monthAmt  = data.filter(e => e.date.startsWith(monthPfx)).reduce((s, e) => s + e.amt, 0);
-    document.getElementById("todayTotal").textContent = "$" + todayAmt.toFixed(2);
-    document.getElementById("monthTotal").textContent = "$" + monthAmt.toFixed(2);
+    document.getElementById("todayTotal").textContent = fmt(todayAmt);
+    document.getElementById("monthTotal").textContent = fmt(monthAmt);
     document.getElementById("headerDate").textContent = new Date().toLocaleDateString(undefined, { weekday:"long", year:"numeric", month:"long", day:"numeric" });
 
     // Nav label
@@ -486,7 +539,7 @@
           <div class="meta">${c.label} · ${e.time || ""}</div>
         </div>
         <div class="expense-right">
-          <div class="amt">$${e.amt.toFixed(2)}</div>
+          <div class="amt">${fmt(e.amt)}</div>
           <button class="btn-delete" onclick="deleteExpense(${e.id})" title="Delete">✕</button>
         </div>`;
       list.appendChild(div);
@@ -505,7 +558,7 @@
           <span class="s-icon">${c.icon}</span>
           <span class="s-label">${c.label}</span>
           <div class="bar-wrap"><div class="bar-fill" style="width:${pct}%;background:${c.bar}"></div></div>
-          <span class="s-amt">$${totals[c.id].toFixed(2)}</span>
+          <span class="s-amt">${fmt(totals[c.id])}</span>
         </div>`;
     });
     document.getElementById("summaryCard").style.display = "block";
@@ -543,6 +596,7 @@
   }
 
   // ── Init ──────────────────────────────────────────────────────────
+  initCurrency();
   buildCatRow();
   render();
 </script>
