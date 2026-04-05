@@ -320,8 +320,11 @@
   }
 
   // ── Auth State ────────────────────────────────────────────────────
+  let currentUser = null;
+
   sb.auth.onAuthStateChange(async (event, session) => {
     if (session) {
+      currentUser = session.user;
       document.getElementById("loginScreen").style.display = "none";
       document.getElementById("appScreen").style.display = "block";
       document.getElementById("userEmail").textContent = session.user.email;
@@ -330,6 +333,7 @@
       viewDate = todayStr();
       await render();
     } else {
+      currentUser = null;
       document.getElementById("loginScreen").style.display = "flex";
       document.getElementById("appScreen").style.display = "none";
     }
@@ -363,18 +367,22 @@
     const btn = document.getElementById("btnAdd");
     btn.disabled = true; btn.textContent = "Saving...";
 
-    const { data: { user } } = await sb.auth.getUser();
-    const { error } = await sb.from("expenses").insert({
-      user_id: user.id,
-      date: todayStr(),
-      description: desc,
-      amount: Math.round(amt * 100) / 100,
-      category: cat,
-      time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-    });
-
-    btn.disabled = false; btn.textContent = "+ Add Expense";
-    if (error) { showToast("Error saving. Try again."); console.error(error); return; }
+    try {
+      if (!currentUser) throw new Error("Not logged in");
+      const { error } = await sb.from("expenses").insert({
+        user_id: currentUser.id,
+        date: todayStr(),
+        description: desc,
+        amount: Math.round(amt * 100) / 100,
+        category: cat,
+        time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+      });
+      btn.disabled = false; btn.textContent = "+ Add Expense";
+      if (error) { showToast("Error: " + error.message); console.error(error); return; }
+    } catch (err) {
+      btn.disabled = false; btn.textContent = "+ Add Expense";
+      showToast("Error saving. Try again."); console.error(err); return;
+    }
 
     document.getElementById("descInput").value = "";
     document.getElementById("amtInput").value  = "";
