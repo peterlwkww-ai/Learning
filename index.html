@@ -4,78 +4,70 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Daily Expense Tracker</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #f0f4f8; color: #2d3748; min-height: 100vh; }
 
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: #f0f4f8;
-      color: #2d3748;
+    /* ── Login Screen ── */
+    #loginScreen {
       min-height: 100vh;
-    }
-
-    header {
-      background: linear-gradient(135deg, #0ea5e9, #10b981);
-      color: white;
-      padding: 20px 24px 28px;
-    }
-    header h1 { font-size: 1.4rem; font-weight: 700; letter-spacing: -0.3px; }
-    header .date { font-size: 0.85rem; opacity: 0.85; margin-top: 2px; }
-    .total-box {
-      margin-top: 16px;
-      background: rgba(255,255,255,0.18);
-      border-radius: 14px;
-      padding: 14px 18px;
       display: flex;
-      justify-content: space-between;
       align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #0ea5e9, #10b981);
+      padding: 24px;
     }
-    .total-box .label { font-size: 0.8rem; opacity: 0.85; text-transform: uppercase; letter-spacing: 0.5px; }
-    .total-box .amount { font-size: 2rem; font-weight: 800; }
-
-    main { max-width: 480px; margin: 0 auto; padding: 20px 16px 100px; }
-
-    .add-card {
+    .login-card {
       background: white;
-      border-radius: 16px;
-      padding: 18px;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.08);
-      margin-bottom: 20px;
+      border-radius: 20px;
+      padding: 36px 28px;
+      width: 100%;
+      max-width: 380px;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.15);
     }
-    .add-card h2 { font-size: 0.95rem; font-weight: 600; margin-bottom: 14px; color: #4a5568; }
-
-    .input-row { display: flex; gap: 8px; margin-bottom: 10px; }
-    .input-row input[type="text"] {
-      flex: 1; padding: 12px 14px; border: 1.5px solid #e2e8f0;
+    .login-logo { font-size: 2.4rem; margin-bottom: 6px; }
+    .login-title { font-size: 1.5rem; font-weight: 800; color: #1a202c; }
+    .login-sub { font-size: 0.85rem; color: #a0aec0; margin-bottom: 28px; margin-top: 4px; }
+    .tab-row { display: flex; background: #f0f4f8; border-radius: 10px; padding: 4px; margin-bottom: 22px; }
+    .tab-btn {
+      flex: 1; padding: 9px; border: none; background: transparent;
+      border-radius: 8px; font-size: 0.9rem; font-weight: 600; cursor: pointer; color: #718096;
+      transition: all 0.2s;
+    }
+    .tab-btn.active { background: white; color: #0ea5e9; box-shadow: 0 1px 6px rgba(0,0,0,0.1); }
+    .login-field { margin-bottom: 14px; }
+    .login-field label { display: block; font-size: 0.78rem; font-weight: 600; color: #4a5568; margin-bottom: 5px; }
+    .login-field input {
+      width: 100%; padding: 12px 14px; border: 1.5px solid #e2e8f0;
       border-radius: 10px; font-size: 1rem; outline: none; transition: border-color 0.2s;
     }
-    .input-row input[type="text"]:focus { border-color: #0ea5e9; }
-    .input-row input[type="number"] {
-      width: 110px; padding: 12px 14px; border: 1.5px solid #e2e8f0;
-      border-radius: 10px; font-size: 1rem; outline: none; transition: border-color 0.2s;
+    .login-field input:focus { border-color: #0ea5e9; }
+    .auth-error { font-size: 0.8rem; color: #ef4444; margin: -6px 0 10px; min-height: 18px; }
+    .auth-success { font-size: 0.8rem; color: #10b981; margin: -6px 0 10px; min-height: 18px; }
+    .btn-auth {
+      width: 100%; padding: 13px;
+      background: linear-gradient(135deg, #0ea5e9, #10b981);
+      color: white; border: none; border-radius: 10px;
+      font-size: 1rem; font-weight: 600; cursor: pointer; transition: opacity 0.2s;
     }
-    .input-row input[type="number"]:focus { border-color: #0ea5e9; }
+    .btn-auth:hover { opacity: 0.9; }
+    .btn-auth:disabled { opacity: 0.6; cursor: not-allowed; }
 
-    .category-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
-    .cat-pill {
-      padding: 5px 12px; border-radius: 20px; border: 1.5px solid #e2e8f0;
-      font-size: 0.78rem; cursor: pointer; background: white; transition: all 0.15s;
-      display: flex; align-items: center; gap: 4px;
+    /* ── App Screen ── */
+    #appScreen { display: none; }
+    header { background: linear-gradient(135deg, #0ea5e9, #10b981); color: white; padding: 20px 24px 28px; }
+    .header-top { display: flex; justify-content: space-between; align-items: flex-start; }
+    .header-top h1 { font-size: 1.4rem; font-weight: 700; letter-spacing: -0.3px; }
+    .btn-logout {
+      background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.4);
+      color: white; border-radius: 8px; padding: 5px 12px; font-size: 0.78rem;
+      cursor: pointer; white-space: nowrap; margin-top: 2px;
     }
-    .cat-pill:hover { border-color: #0ea5e9; color: #0ea5e9; }
-    .cat-pill.active { background: linear-gradient(135deg, #0ea5e9, #10b981); border-color: #0ea5e9; color: white; }
-
-    .btn-add {
-      width: 100%; padding: 13px; background: linear-gradient(135deg, #0ea5e9, #10b981);
-      color: white; border: none; border-radius: 10px; font-size: 1rem;
-      font-weight: 600; cursor: pointer; transition: opacity 0.2s;
-    }
-    .btn-add:hover { opacity: 0.9; }
-    .btn-add:active { opacity: 0.8; }
-
-    .hint { font-size: 0.75rem; color: #a0aec0; margin-bottom: 10px; }
-
-    .currency-row { display: flex; align-items: center; gap: 8px; margin-top: 12px; }
+    .btn-logout:hover { background: rgba(255,255,255,0.3); }
+    .user-email { font-size: 0.75rem; opacity: 0.8; margin-top: 2px; }
+    header .date { font-size: 0.85rem; opacity: 0.85; margin-top: 8px; }
+    .currency-row { display: flex; align-items: center; gap: 8px; margin-top: 10px; }
     .currency-row label { font-size: 0.78rem; opacity: 0.85; text-transform: uppercase; letter-spacing: 0.5px; }
     #currencySelect {
       background: rgba(255,255,255,0.22); border: 1.5px solid rgba(255,255,255,0.4);
@@ -83,38 +75,45 @@
       font-weight: 600; cursor: pointer; outline: none;
     }
     #currencySelect option { background: #1a202c; color: white; }
+    .total-box {
+      margin-top: 14px; background: rgba(255,255,255,0.18);
+      border-radius: 14px; padding: 14px 18px;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .total-box .label { font-size: 0.8rem; opacity: 0.85; text-transform: uppercase; letter-spacing: 0.5px; }
+    .total-box .amount { font-size: 2rem; font-weight: 800; }
 
-    .date-nav {
-      display: flex; align-items: center; justify-content: space-between;
-      margin-bottom: 14px; gap: 6px;
-    }
-    .date-nav button {
-      background: white; border: 1.5px solid #e2e8f0; border-radius: 8px;
-      width: 34px; height: 34px; font-size: 1rem; cursor: pointer;
-      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
-    }
+    main { max-width: 480px; margin: 0 auto; padding: 20px 16px 100px; }
+
+    .add-card { background: white; border-radius: 16px; padding: 18px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); margin-bottom: 20px; }
+    .add-card h2 { font-size: 0.95rem; font-weight: 600; margin-bottom: 14px; color: #4a5568; }
+    .input-row { display: flex; gap: 8px; margin-bottom: 10px; }
+    .input-row input[type="text"] { flex: 1; padding: 12px 14px; border: 1.5px solid #e2e8f0; border-radius: 10px; font-size: 1rem; outline: none; transition: border-color 0.2s; }
+    .input-row input[type="text"]:focus { border-color: #0ea5e9; }
+    .input-row input[type="number"] { width: 110px; padding: 12px 14px; border: 1.5px solid #e2e8f0; border-radius: 10px; font-size: 1rem; outline: none; transition: border-color 0.2s; }
+    .input-row input[type="number"]:focus { border-color: #0ea5e9; }
+    .hint { font-size: 0.75rem; color: #a0aec0; margin-bottom: 10px; }
+    .category-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+    .cat-pill { padding: 5px 12px; border-radius: 20px; border: 1.5px solid #e2e8f0; font-size: 0.78rem; cursor: pointer; background: white; transition: all 0.15s; display: flex; align-items: center; gap: 4px; }
+    .cat-pill:hover { border-color: #0ea5e9; color: #0ea5e9; }
+    .cat-pill.active { background: linear-gradient(135deg, #0ea5e9, #10b981); border-color: #0ea5e9; color: white; }
+    .btn-add { width: 100%; padding: 13px; background: linear-gradient(135deg, #0ea5e9, #10b981); color: white; border: none; border-radius: 10px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: opacity 0.2s; }
+    .btn-add:hover { opacity: 0.9; }
+    .btn-add:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    .date-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; gap: 6px; }
+    .date-nav button { background: white; border: 1.5px solid #e2e8f0; border-radius: 8px; width: 34px; height: 34px; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
     .date-nav button:hover { border-color: #0ea5e9; color: #0ea5e9; }
     .date-nav .nav-center { display: flex; align-items: center; gap: 6px; flex: 1; justify-content: center; }
     .date-nav .nav-label { font-weight: 600; font-size: 0.9rem; cursor: pointer; }
     .date-nav .nav-label:hover { color: #0ea5e9; }
-    .btn-cal {
-      background: white; border: 1.5px solid #e2e8f0; border-radius: 8px;
-      width: 34px; height: 34px; font-size: 1rem; cursor: pointer;
-      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
-    }
+    .btn-cal { background: white; border: 1.5px solid #e2e8f0; border-radius: 8px; width: 34px; height: 34px; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
     .btn-cal:hover { border-color: #0ea5e9; color: #0ea5e9; }
     #calInput { position: absolute; opacity: 0; width: 0; height: 0; pointer-events: none; }
 
-    .section-title {
-      font-size: 0.8rem; font-weight: 600; text-transform: uppercase;
-      letter-spacing: 0.5px; color: #718096; margin-bottom: 10px;
-    }
+    .section-title { font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: #718096; margin-bottom: 10px; }
     .expense-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
-    .expense-item {
-      background: white; border-radius: 12px; padding: 13px 15px;
-      display: flex; align-items: center; gap: 12px;
-      box-shadow: 0 1px 6px rgba(0,0,0,0.06); animation: slideIn 0.2s ease;
-    }
+    .expense-item { background: white; border-radius: 12px; padding: 13px 15px; display: flex; align-items: center; gap: 12px; box-shadow: 0 1px 6px rgba(0,0,0,0.06); animation: slideIn 0.2s ease; }
     @keyframes slideIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
     .cat-icon { width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.15rem; flex-shrink: 0; }
     .expense-info { flex: 1; min-width: 0; }
@@ -124,10 +123,10 @@
     .expense-right .amt { font-size: 1.05rem; font-weight: 700; }
     .btn-delete { background: none; border: none; color: #cbd5e0; font-size: 1rem; cursor: pointer; padding: 2px 4px; margin-top: 2px; }
     .btn-delete:hover { color: #fc8181; }
-
     .empty-state { text-align: center; padding: 32px 16px; color: #a0aec0; }
     .empty-state .icon { font-size: 2.5rem; margin-bottom: 8px; }
     .empty-state p { font-size: 0.9rem; }
+    .loading-state { text-align: center; padding: 32px 16px; color: #a0aec0; font-size: 0.9rem; }
 
     .summary-card { background: white; border-radius: 16px; padding: 16px 18px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); }
     .summary-card h2 { font-size: 0.95rem; font-weight: 600; color: #4a5568; margin-bottom: 12px; }
@@ -138,80 +137,118 @@
     .bar-fill { height: 100%; border-radius: 6px; transition: width 0.4s ease; }
     .summary-row .s-amt { font-size: 0.85rem; font-weight: 600; min-width: 60px; text-align: right; }
 
-    .toast {
-      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px);
-      background: #2d3748; color: white; padding: 10px 20px; border-radius: 24px;
-      font-size: 0.85rem; transition: transform 0.3s ease; z-index: 999; pointer-events: none;
-    }
+    .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px); background: #2d3748; color: white; padding: 10px 20px; border-radius: 24px; font-size: 0.85rem; transition: transform 0.3s ease; z-index: 999; pointer-events: none; }
     .toast.show { transform: translateX(-50%) translateY(0); }
   </style>
 </head>
 <body>
 
-<header>
-  <h1>💰 Daily Expense Tracker</h1>
-  <div class="date" id="headerDate"></div>
-  <div class="currency-row">
-    <label>Currency</label>
-    <select id="currencySelect" onchange="setCurrency(this.value)">
-      <option value="$">$ USD</option>
-      <option value="RM">RM MYR</option>
-      <option value="S$">S$ SGD</option>
-      <option value="£">£ GBP</option>
-      <option value="€">€ EUR</option>
-      <option value="¥">¥ JPY</option>
-      <option value="฿">฿ THB</option>
-      <option value="Rp">Rp IDR</option>
-      <option value="A$">A$ AUD</option>
-      <option value="₩">₩ KRW</option>
-    </select>
-  </div>
-  <div class="total-box">
-    <div>
-      <div class="label">Today's Total</div>
-      <div class="amount" id="todayTotal">$0.00</div>
-    </div>
-    <div style="text-align:right">
-      <div class="label">This Month</div>
-      <div style="font-size:1.1rem;font-weight:700;" id="monthTotal">$0.00</div>
-    </div>
-  </div>
-</header>
+<!-- ── Login Screen ── -->
+<div id="loginScreen">
+  <div class="login-card">
+    <div class="login-logo">💰</div>
+    <div class="login-title">Expense Tracker</div>
+    <div class="login-sub">Track your daily spending — from anywhere</div>
 
-<main>
-  <div class="add-card">
-    <h2>Add Expense</h2>
-    <div class="input-row">
-      <input type="text" id="descInput" placeholder="What did you spend on?" />
-      <input type="number" id="amtInput" placeholder="0.00" min="0" step="0.01" />
+    <div class="tab-row">
+      <button class="tab-btn active" id="tabLogin" onclick="setTab('login')">Log In</button>
+      <button class="tab-btn" id="tabSignup" onclick="setTab('signup')">Sign Up</button>
     </div>
-    <div class="hint">Tip: type a description, pick a category, enter amount, then tap Add.</div>
-    <div class="category-row" id="catRow"></div>
-    <button class="btn-add" onclick="addExpense()">+ Add Expense</button>
-  </div>
 
-  <div class="date-nav">
-    <button onclick="shiftDay(-1)">&#8592;</button>
-    <div class="nav-center">
-      <span class="nav-label" id="navLabel" onclick="openCal()"></span>
-      <button class="btn-cal" onclick="openCal()" title="Pick a date">&#128197;</button>
-      <input type="date" id="calInput" onchange="pickDate(this.value)" />
+    <div class="login-field">
+      <label>Email</label>
+      <input type="email" id="authEmail" placeholder="you@email.com" />
     </div>
-    <button onclick="shiftDay(1)">&#8594;</button>
+    <div class="login-field">
+      <label>Password</label>
+      <input type="password" id="authPass" placeholder="••••••••" />
+    </div>
+    <div id="authError" class="auth-error"></div>
+    <div id="authSuccess" class="auth-success"></div>
+    <button class="btn-auth" id="authBtn" onclick="submitAuth()">Log In</button>
   </div>
+</div>
 
-  <div class="section-title">Expenses</div>
-  <div class="expense-list" id="expenseList"></div>
+<!-- ── App Screen ── -->
+<div id="appScreen">
+  <header>
+    <div class="header-top">
+      <div>
+        <h1>💰 Daily Expense Tracker</h1>
+        <div class="user-email" id="userEmail"></div>
+      </div>
+      <button class="btn-logout" onclick="logout()">Log out</button>
+    </div>
+    <div class="date" id="headerDate"></div>
+    <div class="currency-row">
+      <label>Currency</label>
+      <select id="currencySelect" onchange="setCurrency(this.value)">
+        <option value="$">$ USD</option>
+        <option value="RM">RM MYR</option>
+        <option value="S$">S$ SGD</option>
+        <option value="£">£ GBP</option>
+        <option value="€">€ EUR</option>
+        <option value="¥">¥ JPY</option>
+        <option value="฿">฿ THB</option>
+        <option value="Rp">Rp IDR</option>
+        <option value="A$">A$ AUD</option>
+        <option value="₩">₩ KRW</option>
+      </select>
+    </div>
+    <div class="total-box">
+      <div>
+        <div class="label">Today's Total</div>
+        <div class="amount" id="todayTotal">—</div>
+      </div>
+      <div style="text-align:right">
+        <div class="label">This Month</div>
+        <div style="font-size:1.1rem;font-weight:700;" id="monthTotal">—</div>
+      </div>
+    </div>
+  </header>
 
-  <div class="summary-card" id="summaryCard" style="display:none">
-    <h2>Breakdown by Category</h2>
-    <div id="summaryRows"></div>
-  </div>
-</main>
+  <main>
+    <div class="add-card">
+      <h2>Add Expense</h2>
+      <div class="input-row">
+        <input type="text" id="descInput" placeholder="What did you spend on?" />
+        <input type="number" id="amtInput" placeholder="0.00" min="0" step="0.01" />
+      </div>
+      <div class="hint">Tip: type a description, pick a category, enter amount, then tap Add.</div>
+      <div class="category-row" id="catRow"></div>
+      <button class="btn-add" id="btnAdd" onclick="addExpense()">+ Add Expense</button>
+    </div>
+
+    <div class="date-nav">
+      <button onclick="shiftDay(-1)">&#8592;</button>
+      <div class="nav-center">
+        <span class="nav-label" id="navLabel" onclick="openCal()"></span>
+        <button class="btn-cal" onclick="openCal()" title="Pick a date">&#128197;</button>
+        <input type="date" id="calInput" onchange="pickDate(this.value)" />
+      </div>
+      <button onclick="shiftDay(1)">&#8594;</button>
+    </div>
+
+    <div class="section-title">Expenses</div>
+    <div class="expense-list" id="expenseList"></div>
+
+    <div class="summary-card" id="summaryCard" style="display:none">
+      <h2>Breakdown by Category</h2>
+      <div id="summaryRows"></div>
+    </div>
+  </main>
+</div>
 
 <div class="toast" id="toast"></div>
 
 <script>
+  // ── Supabase ──────────────────────────────────────────────────────
+  const sb = window.supabase.createClient(
+    'https://uyprfnecemfzrimijstv.supabase.co',
+    'sb_publishable_-osEHub1bznz81nu_Lztmw_LNdd0msA'
+  );
+
+  // ── Categories ────────────────────────────────────────────────────
   const CATEGORIES = [
     { id: "food",          label: "Food",      icon: "🍔", color: "#fef3c7", bar: "#f59e0b" },
     { id: "transport",     label: "Transport", icon: "🚌", color: "#dbeafe", bar: "#3b82f6" },
@@ -221,7 +258,6 @@
     { id: "bills",         label: "Bills",     icon: "📄", color: "#fee2e2", bar: "#ef4444" },
     { id: "other",         label: "Other",     icon: "📦", color: "#f1f5f9", bar: "#94a3b8" },
   ];
-
   const KEYWORDS = {
     food:          ["food","lunch","dinner","breakfast","coffee","cafe","restaurant","eat","meal","snack","drink","bubble","pizza","noodle","rice","bread","milk","grocery","market","supermarket"],
     transport:     ["bus","train","taxi","grab","uber","mrt","lrt","ferry","fuel","petrol","parking","toll","flight","ticket","transport","bike","car"],
@@ -230,7 +266,6 @@
     entertainment: ["movie","cinema","game","netflix","spotify","youtube","fun","concert","sport","ticket","book","magazine"],
     bills:         ["bill","electric","water","internet","wifi","phone","rent","insurance","subscription","credit"],
   };
-
   function guessCategory(desc) {
     const lower = desc.toLowerCase();
     for (const [cat, words] of Object.entries(KEYWORDS)) {
@@ -241,30 +276,73 @@
 
   // ── Currency ──────────────────────────────────────────────────────
   let currency = localStorage.getItem("currency") || "$";
-
-  function setCurrency(val) {
-    currency = val;
-    localStorage.setItem("currency", val);
-    render();
-  }
-
+  function setCurrency(val) { currency = val; localStorage.setItem("currency", val); render(); }
   function fmt(amt) { return currency + amt.toFixed(2); }
+  function initCurrency() { document.getElementById("currencySelect").value = currency; }
 
-  function initCurrency() {
-    document.getElementById("currencySelect").value = currency;
+  // ── Auth UI ───────────────────────────────────────────────────────
+  let authMode = "login";
+
+  function setTab(mode) {
+    authMode = mode;
+    document.getElementById("tabLogin").classList.toggle("active", mode === "login");
+    document.getElementById("tabSignup").classList.toggle("active", mode === "signup");
+    document.getElementById("authBtn").textContent = mode === "login" ? "Log In" : "Create Account";
+    document.getElementById("authError").textContent = "";
+    document.getElementById("authSuccess").textContent = "";
   }
+
+  async function submitAuth() {
+    const email = document.getElementById("authEmail").value.trim();
+    const pass  = document.getElementById("authPass").value;
+    const errEl = document.getElementById("authError");
+    const okEl  = document.getElementById("authSuccess");
+    errEl.textContent = ""; okEl.textContent = "";
+
+    if (!email || !pass) { errEl.textContent = "Please enter your email and password."; return; }
+    if (pass.length < 6) { errEl.textContent = "Password must be at least 6 characters."; return; }
+
+    const btn = document.getElementById("authBtn");
+    btn.disabled = true; btn.textContent = "Please wait...";
+
+    if (authMode === "login") {
+      const { error } = await sb.auth.signInWithPassword({ email, password: pass });
+      if (error) { errEl.textContent = error.message; btn.disabled = false; btn.textContent = "Log In"; }
+    } else {
+      const { error } = await sb.auth.signUp({ email, password: pass });
+      if (error) { errEl.textContent = error.message; btn.disabled = false; btn.textContent = "Create Account"; }
+      else { okEl.textContent = "Account created! Check your email to confirm, then log in."; btn.disabled = false; btn.textContent = "Create Account"; }
+    }
+  }
+
+  async function logout() {
+    await sb.auth.signOut();
+  }
+
+  // ── Auth State ────────────────────────────────────────────────────
+  sb.auth.onAuthStateChange(async (event, session) => {
+    if (session) {
+      document.getElementById("loginScreen").style.display = "none";
+      document.getElementById("appScreen").style.display = "block";
+      document.getElementById("userEmail").textContent = session.user.email;
+      initCurrency();
+      buildCatRow();
+      viewDate = todayStr();
+      await render();
+    } else {
+      document.getElementById("loginScreen").style.display = "flex";
+      document.getElementById("appScreen").style.display = "none";
+    }
+  });
 
   // ── State ─────────────────────────────────────────────────────────
   let viewDate = todayStr();
   let selectedCat = "food";
-
   function todayStr() { return new Date().toISOString().slice(0, 10); }
-  function loadData() { return JSON.parse(localStorage.getItem("expenses_v1") || "[]"); }
-  function saveData(data) { localStorage.setItem("expenses_v1", JSON.stringify(data)); }
 
+  // ── Category pills ────────────────────────────────────────────────
   function buildCatRow() {
-    const row = document.getElementById("catRow");
-    row.innerHTML = "";
+    const row = document.getElementById("catRow"); row.innerHTML = "";
     CATEGORIES.forEach(c => {
       const btn = document.createElement("button");
       btn.className = "cat-pill" + (c.id === selectedCat ? " active" : "");
@@ -274,43 +352,63 @@
     });
   }
 
-  function addExpense() {
+  // ── Add expense ───────────────────────────────────────────────────
+  async function addExpense() {
     const desc = document.getElementById("descInput").value.trim();
     const amt  = parseFloat(document.getElementById("amtInput").value);
     if (!desc) { showToast("Please enter a description."); return; }
     if (!amt || amt <= 0) { showToast("Please enter a valid amount."); return; }
+
     const cat = guessCategory(desc) !== "other" ? guessCategory(desc) : selectedCat;
-    const data = loadData();
-    data.push({
-      id: Date.now(), date: todayStr(), desc,
-      amt: Math.round(amt * 100) / 100, cat,
+    const btn = document.getElementById("btnAdd");
+    btn.disabled = true; btn.textContent = "Saving...";
+
+    const { data: { user } } = await sb.auth.getUser();
+    const { error } = await sb.from("expenses").insert({
+      user_id: user.id,
+      date: todayStr(),
+      description: desc,
+      amount: Math.round(amt * 100) / 100,
+      category: cat,
       time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
     });
-    saveData(data);
+
+    btn.disabled = false; btn.textContent = "+ Add Expense";
+    if (error) { showToast("Error saving. Try again."); console.error(error); return; }
+
     document.getElementById("descInput").value = "";
     document.getElementById("amtInput").value  = "";
     viewDate = todayStr();
-    render();
+    await render();
     showToast("Expense added!");
   }
 
   document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("amtInput").addEventListener("keydown", e => { if (e.key === "Enter") addExpense(); });
     document.getElementById("descInput").addEventListener("keydown", e => { if (e.key === "Enter") document.getElementById("amtInput").focus(); });
+    document.getElementById("authEmail").addEventListener("keydown", e => { if (e.key === "Enter") document.getElementById("authPass").focus(); });
+    document.getElementById("authPass").addEventListener("keydown", e => { if (e.key === "Enter") submitAuth(); });
     document.getElementById("descInput").addEventListener("input", e => {
-      const guess = guessCategory(e.target.value);
-      if (guess !== "other") { selectedCat = guess; buildCatRow(); }
+      const g = guessCategory(e.target.value);
+      if (g !== "other") { selectedCat = g; buildCatRow(); }
     });
   });
 
-  function deleteExpense(id) { saveData(loadData().filter(e => e.id !== id)); render(); showToast("Removed."); }
+  // ── Delete expense ────────────────────────────────────────────────
+  async function deleteExpense(id) {
+    const { error } = await sb.from("expenses").delete().eq("id", id);
+    if (error) { showToast("Error deleting."); return; }
+    await render();
+    showToast("Removed.");
+  }
 
-  function shiftDay(delta) {
+  // ── Date navigation ───────────────────────────────────────────────
+  async function shiftDay(delta) {
     const d = new Date(viewDate + "T00:00:00");
     d.setDate(d.getDate() + delta);
     const next = d.toISOString().slice(0, 10);
     if (next > todayStr()) { showToast("Can't go to the future!"); return; }
-    viewDate = next; render();
+    viewDate = next; await render();
   }
 
   function friendlyDate(str) {
@@ -327,29 +425,48 @@
     cal.style.pointerEvents = "auto";
     cal.showPicker ? cal.showPicker() : cal.click();
   }
-
-  function pickDate(val) {
+  async function pickDate(val) {
     if (!val || val > todayStr()) { showToast("Can't go to the future!"); return; }
-    viewDate = val; render();
+    viewDate = val; await render();
     document.getElementById("calInput").style.pointerEvents = "none";
   }
 
-  function render() {
-    const data = loadData(), today = todayStr();
-    const todayAmt = data.filter(e => e.date === today).reduce((s, e) => s + e.amt, 0);
-    const monthAmt = data.filter(e => e.date.startsWith(today.slice(0,7))).reduce((s, e) => s + e.amt, 0);
+  // ── Render ────────────────────────────────────────────────────────
+  async function render() {
+    document.getElementById("expenseList").innerHTML = '<div class="loading-state">Loading...</div>';
+    document.getElementById("summaryCard").style.display = "none";
+
+    const today = todayStr();
+    const monthStart = today.slice(0, 7) + "-01";
+
+    const { data, error } = await sb
+      .from("expenses")
+      .select("*")
+      .gte("date", monthStart)
+      .order("created_at", { ascending: false });
+
+    if (error) { showToast("Error loading data."); console.error(error); return; }
+
+    const all = (data || []).map(e => ({
+      id: e.id, date: e.date, desc: e.description,
+      amt: parseFloat(e.amount), cat: e.category, time: e.time || "",
+    }));
+
+    // Header totals
+    const todayAmt = all.filter(e => e.date === today).reduce((s, e) => s + e.amt, 0);
+    const monthAmt = all.reduce((s, e) => s + e.amt, 0);
     document.getElementById("todayTotal").textContent = fmt(todayAmt);
     document.getElementById("monthTotal").textContent = fmt(monthAmt);
     document.getElementById("headerDate").textContent = new Date().toLocaleDateString(undefined, { weekday:"long", year:"numeric", month:"long", day:"numeric" });
     document.getElementById("navLabel").textContent = friendlyDate(viewDate);
 
-    const items = data.filter(e => e.date === viewDate).reverse();
+    // Filter to viewDate
+    const items = all.filter(e => e.date === viewDate);
     const list  = document.getElementById("expenseList");
     list.innerHTML = "";
 
     if (items.length === 0) {
       list.innerHTML = `<div class="empty-state"><div class="icon">📭</div><p>No expenses recorded for ${friendlyDate(viewDate)}.</p></div>`;
-      document.getElementById("summaryCard").style.display = "none";
       return;
     }
 
@@ -361,23 +478,23 @@
         <div class="cat-icon" style="background:${c.color};">${c.icon}</div>
         <div class="expense-info">
           <div class="desc">${escHtml(e.desc)}</div>
-          <div class="meta">${c.label} · ${e.time || ""}</div>
+          <div class="meta">${c.label} · ${e.time}</div>
         </div>
         <div class="expense-right">
           <div class="amt">${fmt(e.amt)}</div>
-          <button class="btn-delete" onclick="deleteExpense(${e.id})" title="Delete">✕</button>
+          <button class="btn-delete" onclick="deleteExpense('${e.id}')" title="Delete">✕</button>
         </div>`;
       list.appendChild(div);
     });
 
+    // Summary
     const totals = {};
     items.forEach(e => { totals[e.cat] = (totals[e.cat] || 0) + e.amt; });
     const dayTotal = items.reduce((s, e) => s + e.amt, 0);
-    const summaryRows = document.getElementById("summaryRows");
-    summaryRows.innerHTML = "";
+    const sr = document.getElementById("summaryRows"); sr.innerHTML = "";
     CATEGORIES.filter(c => totals[c.id]).forEach(c => {
       const pct = dayTotal > 0 ? (totals[c.id] / dayTotal * 100) : 0;
-      summaryRows.innerHTML += `
+      sr.innerHTML += `
         <div class="summary-row">
           <span class="s-icon">${c.icon}</span>
           <span class="s-label">${c.label}</span>
@@ -388,12 +505,9 @@
     document.getElementById("summaryCard").style.display = "block";
   }
 
+  // ── Helpers ───────────────────────────────────────────────────────
   function escHtml(s) { return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
   function showToast(msg) { const t = document.getElementById("toast"); t.textContent = msg; t.classList.add("show"); setTimeout(() => t.classList.remove("show"), 2200); }
-
-  initCurrency();
-  buildCatRow();
-  render();
 </script>
 </body>
 </html>
